@@ -1,20 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Unpack Gear</title>
+  <meta charset="UTF-8">
+  <title>Pack - GigCheck</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="gear.html">Gear</a>
-    <a href="events.html">Events</a>
-    <a href="pack.html">Pack</a>
-    <a href="reports.html">Reports</a>
-  </nav>
+  <header>
+    <h1>📦 Pack Gear</h1>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="gear.html">Gear</a>
+      <a href="events.html">Events</a>
+      <a href="pack.html">Pack</a>
+      <a href="unpack.html">Unpack</a>
+      <a href="reports.html">Reports</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
   <main>
-    <h2>Unpack Items</h2>
-    <!-- Barcode Scanner & Unpacking -->
+    <h2>Select Event</h2>
+    <select id="eventSelect"></select>
+
+    <h2>Scan Container</h2>
+    <input type="text" id="containerInput" placeholder="Scan or enter container ID">
+    <button id="confirmContainerBtn">Confirm Container</button>
+
+    <div id="packingSection" style="display: none;">
+      <h2>Scan Item</h2>
+      <input type="text" id="itemInput" placeholder="Scan or enter item ID or name">
+      <input type="number" id="quantityInput" placeholder="Quantity" min="1" value="1">
+      <input type="text" id="packedBy" placeholder="Packed by">
+      <button id="packItemBtn">Add/Update Packed Item</button>
+
+      <h3>Items Packed into Container</h3>
+      <ul id="packedList"></ul>
+
+      <button id="confirmPack">✅ Confirm Pack</button>
+    </div>
   </main>
+
+  <script>
+    const eventSelect = document.getElementById('eventSelect');
+    const containerInput = document.getElementById('containerInput');
+    const confirmContainerBtn = document.getElementById('confirmContainerBtn');
+    const itemInput = document.getElementById('itemInput');
+    const quantityInput = document.getElementById('quantityInput');
+    const packedBy = document.getElementById('packedBy');
+    const packedList = document.getElementById('packedList');
+    const confirmBtn = document.getElementById('confirmPack');
+    const packingSection = document.getElementById('packingSection');
+
+    let currentEventId = null;
+    let currentContainer = null;
+    let packedItems = [];
+
+    function getEvents() {
+      return JSON.parse(localStorage.getItem('events') || '[]');
+    }
+
+    function getGear() {
+      return JSON.parse(localStorage.getItem('gear') || '[]');
+    }
+
+    function saveEvents(events) {
+      localStorage.setItem('events', JSON.stringify(events));
+    }
+
+    function populateEvents() {
+      const events = getEvents();
+      eventSelect.innerHTML = '';
+      events.forEach(evt => {
+        const option = document.createElement('option');
+        option.value = evt.id;
+        option.textContent = `${evt.name} (${evt.start})`;
+        eventSelect.appendChild(option);
+      });
+    }
+
+    eventSelect.addEventListener('change', () => {
+      currentEventId = eventSelect.value;
+      packedItems = [];
+      packedList.innerHTML = '';
+      packingSection.style.display = 'none';
+    });
+
+    confirmContainerBtn.addEventListener('click', () => {
+      if (!containerInput.value.trim()) {
+        alert('Please enter a container ID');
+        return;
+      }
+      currentContainer = containerInput.value.trim();
+      packingSection.style.display = 'block';
+    });
+
+    document.getElementById('packItemBtn').addEventListener('click', () => {
+      const itemIdOrName = itemInput.value.trim();
+      const quantity = parseInt(quantityInput.value, 10);
+      const packedByUser = packedBy.value.trim();
+
+      if (!itemIdOrName || !packedByUser || !currentEventId || !currentContainer || quantity < 1) return;
+
+      const gearList = getGear();
+      const foundItem = gearList.find(item => item.id === itemIdOrName || item.name.toLowerCase() === itemIdOrName.toLowerCase());
+
+      if (!foundItem) {
+        alert('Item not found');
+        return;
+      }
+
+      const packedItem = {
+        id: foundItem.id,
+        quantity,
+        container: currentContainer,
+        packedBy: packedByUser,
+        date: new Date().toISOString()
+      };
+
+      packedItems.push(packedItem);
+      const li = document.createElement('li');
+      li.textContent = `${foundItem.name} (x${quantity}) packed by ${packedByUser}`;
+      packedList.appendChild(li);
+      itemInput.value = '';
+      quantityInput.value = 1;
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      const events = getEvents();
+      const eventIndex = events.findIndex(e => e.id === currentEventId);
+      if (eventIndex === -1) return;
+
+      events[eventIndex].packed = true;
+      events[eventIndex].packedItems = [...(events[eventIndex].packedItems || []), ...packedItems];
+      saveEvents(events);
+      alert('Packing confirmed and saved!');
+      packedItems = [];
+      packedList.innerHTML = '';
+      packingSection.style.display = 'none';
+      containerInput.value = '';
+    });
+
+    populateEvents();
+  </script>
 </body>
 </html>
