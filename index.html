@@ -1,29 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>GigCheck Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #e0f7fa);
+    }
+    header {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    main {
+      padding: 20px;
+    }
+    .welcome {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(to right, #007cf0, #00dfd8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>🎛️ GigCheck</h1>
     <nav>
+      <a href="index.html">Dashboard</a>
       <a href="gear.html">Gear</a>
       <a href="events.html">Events</a>
       <a href="pack.html">Pack</a>
       <a href="unpack.html">Unpack</a>
       <a href="reports.html">Reports</a>
+      <a href="settings.html">Settings</a>
     </nav>
   </header>
-
   <main>
-    <h2>Welcome to GigCheck</h2>
-    <p>Use the navigation to get started.</p>
+    <h1 class="welcome">Welcome to GigCheck</h1>
+    <p>Manage your equipment, events, and logistics with ease.</p>
   </main>
-
-  <script src="data.js"></script>
-  <script src="utils.js"></script>
 </body>
 </html>
