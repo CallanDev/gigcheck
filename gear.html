@@ -1,20 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Gear Management</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Gear - GigCheck</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="events.html">Events</a>
-    <a href="pack.html">Pack</a>
-    <a href="unpack.html">Unpack</a>
-    <a href="reports.html">Reports</a>
-  </nav>
+  <header>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="gear.html" class="active">Gear</a>
+      <a href="events.html">Events</a>
+      <a href="pack.html">Pack</a>
+      <a href="unpack.html">Unpack</a>
+      <a href="reports.html">Reports</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
+
   <main>
-    <h2>Manage Gear</h2>
-    <!-- Add/Edit/Delete Gear with PAT and Maintenance -->
+    <h1>Add Gear</h1>
+    <input id="gearName" type="text" placeholder="Gear Name">
+    <input id="gearId" type="text" placeholder="Gear ID">
+    <input id="nickname" type="text" placeholder="Nickname">
+    <input id="quantity" type="number" min="1" placeholder="Quantity">
+    <input id="dueDate" type="date" placeholder="PAT Due Date">
+    <button onclick="addGear()">Add Gear</button>
+
+    <h2>Gear List</h2>
+    <ul id="gearList"></ul>
   </main>
+
+  <script>
+    function addGear() {
+      const name = document.getElementById('gearName').value.trim();
+      const id = document.getElementById('gearId').value.trim();
+      const nickname = document.getElementById('nickname').value.trim();
+      const quantity = parseInt(document.getElementById('quantity').value);
+      const dueDate = document.getElementById('dueDate').value;
+
+      if (!name || !id || !dueDate || isNaN(quantity)) return alert("Fill all fields");
+
+      let gear = JSON.parse(localStorage.getItem("gear") || "[]");
+      const index = gear.findIndex(g => g.id === id);
+      const item = { name, id, nickname, quantity, dueDate, available: true };
+
+      if (index > -1) gear[index] = item;
+      else gear.push(item);
+
+      localStorage.setItem("gear", JSON.stringify(gear));
+      renderGear();
+    }
+
+    function renderGear() {
+      const gear = JSON.parse(localStorage.getItem("gear") || "[]");
+      const list = document.getElementById("gearList");
+      list.innerHTML = "";
+      gear.forEach(g => {
+        const li = document.createElement("li");
+        li.textContent = `${g.name} (${g.id}) - Qty: ${g.quantity}, PAT: ${g.dueDate}`;
+        list.appendChild(li);
+      });
+    }
+
+    renderGear();
+  </script>
 </body>
 </html>
