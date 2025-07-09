@@ -1,20 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Event Management</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Events - GigCheck</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="gear.html">Gear</a>
-    <a href="pack.html">Pack</a>
-    <a href="unpack.html">Unpack</a>
-    <a href="reports.html">Reports</a>
-  </nav>
+  <header>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="gear.html">Gear</a>
+      <a href="events.html" class="active">Events</a>
+      <a href="pack.html">Pack</a>
+      <a href="unpack.html">Unpack</a>
+      <a href="reports.html">Reports</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
+
   <main>
-    <h2>Manage Events</h2>
-    <!-- Create/View/Edit Events -->
+    <h1>Create Event</h1>
+    <input id="eventName" type="text" placeholder="Event Name">
+    <input id="eventLocation" type="text" placeholder="Location">
+    <input id="eventStart" type="date">
+    <input id="eventEnd" type="date">
+    <button onclick="addEvent()">Add Event</button>
+
+    <h2>Events</h2>
+    <ul id="eventList"></ul>
   </main>
+
+  <script>
+    function addEvent() {
+      const name = document.getElementById('eventName').value.trim();
+      const location = document.getElementById('eventLocation').value.trim();
+      const start = document.getElementById('eventStart').value;
+      const end = document.getElementById('eventEnd').value;
+
+      if (!name || !location || !start || !end) return alert("Fill all fields");
+
+      const events = JSON.parse(localStorage.getItem("events") || "[]");
+      events.push({ id: Date.now().toString(), name, location, start, end, packedItems: [], unpackedItems: [] });
+      localStorage.setItem("events", JSON.stringify(events));
+      renderEvents();
+    }
+
+    function renderEvents() {
+      const events = JSON.parse(localStorage.getItem("events") || "[]");
+      const list = document.getElementById("eventList");
+      list.innerHTML = "";
+      events.forEach(e => {
+        const li = document.createElement("li");
+        li.textContent = `${e.name} - ${e.location} (${e.start} to ${e.end})`;
+        list.appendChild(li);
+      });
+    }
+
+    renderEvents();
+  </script>
 </body>
 </html>
